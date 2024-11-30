@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CSV Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+/* Light mode styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.data-table-container {
+    width: 1200px; /* Increased table container width */
+    height: 410px;
+    background: #f4f4f4;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+table {
+    width: 100%;
+    height: 100%;
+    font-size: 14px;
+    table-layout: fixed;
+    background-color: #ffffff;
+    color: #333;
+    border-collapse: collapse;
+    overflow-y: scroll;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+td {
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #282828;
+    color: #e0e0e0;
+}
+
+.dark-mode .data-table-container {
+    background: #3C3C3C;
+}
+
+.dark-mode table {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+.dark-mode th {
+    background-color: #333;
+    color: #fff;
+}
+
+.dark-mode td {
+    background-color: #252525;
+    color: #e0e0e0;
+}
+
+/* Dark Mode Toggle Button (Icon Only, No Box) */
+#darkModeToggle {
+    position: absolute;
+    top: 10px; /* Position the toggle slightly closer to the top */
+    right: 10px; /* Position it to the right */
+    background-color: transparent; /* Make the background transparent */
+    color: white;
+    padding: 0; /* Remove padding to only show the icon */
+    border: none; /* Remove border */
+    cursor: pointer;
+    font-size: 24px; /* Adjust icon size */
+    z-index: 100; /* Ensure it stays on top of other content */
+    transition: color 0.3s ease; /* Smooth transition for icon color */
+}
+
+/* On hover, change the icon color */
+#darkModeToggle:hover {
+    color: #ddd; /* Slightly lighter color on hover */
+}
+
+/* Icon inside dark mode toggle button */
+#darkModeIcon {
+    font-size: 24px; /* Adjust icon size */
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 1024px) {
+    #darkModeToggle {
+        font-size: 20px; /* Smaller icon size for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    #darkModeToggle {
+        font-size: 18px; /* Smaller icon size for even smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    #darkModeToggle {
+        font-size: 16px; /* Adjust the icon size for very small screens */
+    }
+}
+
+/* Button Styles */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 900px;
+    position: relative;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.button {
+    width: 197px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+}
+
+.clean-data {
+    background: #4CAF50;
+}
+
+.generate-report {
+    background: #2196F3;
+}
+
+.back-button-container {
+    margin-top: 20px;
+}
+
+.back-button {
+    color: white;
+    background: #333;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .data-table-container {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button {
+        width: 80%;
+        margin: 10px 0;
+    }
+
+    .data-table-container {
+        height: auto;
+        max-height: 400px;
+    }
+}
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50; /* Default color for success */
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 1000;
+}
+
+.notification.error {
+    background-color: #F44336; /* Red color for error */
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+/* Optional: You can add a fade-out effect */
+.notification.fade-out {
+    opacity: 0;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Dark Mode Toggle Button -->
+        <button id="darkModeToggle" class="action-button">
+            <i id="darkModeIcon" class="fa fa-moon"></i>
+        </button>
+
+        <!-- Dashboard Title -->
+        <div class="title">CSV Data Overview</div>
+
+        <!-- Table Container -->
+        <div class="data-table-container">
+            <table id="dataTable" class="data-table">
+                <thead>
+                    <tr>
+                        <!-- Dynamically create table headers from the CSV columns -->
+                        {% for column in columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically create table rows from the CSV data -->
+                    {% for row in data %}
+                        <tr>
+                            {% for cell in row %}
+                                <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Button Container for "Clean Data" and "Generate Report" -->
+        <div class="button-container">
+            <div class="button clean-data" onclick="cleanData()">Clean Data</div>
+            <div class="button generate-report" onclick="generateReport()">Generate Report</div>
+        </div>
+
+        <!-- Back to Home Button -->
+        <div class="back-button-container">
+            <a href="/" class="back-button">Back to Home</a>
+        </div>
+    </div>
+
+    <script src="static/js/scriptcd.js"></script>
+
+    <script>
+        // Dark mode toggle functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+    
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
+            } else {
+                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.add('fa-moon');
+            }
+        });
+    
+        // Function to show notifications
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.classList.add('notification');
+            if (isError) {
+                notification.classList.add('error');
+            }
+    
+            notification.innerText = message;
+            document.body.appendChild(notification);
+    
+            // Show notification with fade-in effect
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+    
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+    
+        // Function to clean the data (fetches most recent file, processes it)
+        function cleanData() {
+            fetch('/get_recent_file')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const filename = data.filename;
+                        console.log('Found the most recent file:', filename);
+    
+                        // Call the clean_data route with the recent file
+                        fetch(`/clean_data/${filename}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showNotification(`Data cleaned`, false);
+    
+                                    // Fetch the cleaned data from processed_data folder
+                                    fetch(`/processed_data/${data.filename}`)
+                                        .then(response => response.json())
+                                        .then(cleanedData => {
+                                            // Update the table with the cleaned data
+                                            updateTable(cleanedData);
+                                        })
+                                        .catch(error => {
+                                            console.error('Error fetching cleaned data:', error);
+                                            showNotification('Error fetching cleaned data', true);
+                                        });
+                                } else {
+                                    showNotification('Error cleaning data', true);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error cleaning data:', error);
+                                showNotification('Error cleaning data', true);
+                            });
+                    } else {
+                        showNotification('No recent file found', true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recent file:', error);
+                    showNotification('Error fetching recent file', true);
+                });
+        }
+    
+        // Function to update the table with cleaned data
+        function updateTable(cleanedData) {
+            const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear the existing table rows
+    
+            // Loop through the cleaned data and populate the table
+            cleanedData.forEach(row => {
+                const rowElement = document.createElement('tr');
+                row.forEach(cell => {
+                    const cellElement = document.createElement('td');
+                    cellElement.textContent = cell;
+                    rowElement.appendChild(cellElement);
+                });
+                tableBody.appendChild(rowElement);
+            });
+        }
+    
+     // Function to generate the report (fetches and navigates to the dashboard)
+function generateReport() {
+    fetch('/get_recent_file')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const filename = data.filename;
+                console.log('Found the most recent file:', filename);
+
+                // Call the backend route to generate the report
+                fetch(`/generate_report/${filename}`)
+                    .then(response => {
+                        if (response.ok) {
+                            // Redirect to the dashboard page (after report generation)
+                            window.location.href = `/dashboard/${filename}`;
+                        } else {
+                            showNotification('Error generating report', true);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error generating report:', error);
+                        showNotification('Error generating report', true);
+                    });
+            } else {
+                showNotification('No recent file found', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching recent file:', error);
+            showNotification('Error fetching recent file', true);
+        });
+}
+
+    
+        // Fetch cleaned data from the processed folder and update the table
+        fetch(`/processed_data/${data.filename}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(cleanedData => {
+                console.log('Cleaned Data:', cleanedData); // Check the data received
+                updateTable(cleanedData);
+            })
+            .catch(error => {
+                console.error('Error fetching cleaned data:', error);
+                showNotification('Error fetching cleaned data', true);
+            });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page - CSV Upload</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    
+    <!-- Add Font Awesome CDN for the icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Dark Mode Toggle Button -->
+        <button id="darkModeToggle" class="action-button">
+            <i id="darkModeIcon" class="fa fa-moon"></i> <!-- Dark mode icon -->
+        </button>
+
+        <div class="main-content">
+            <div class="title">CSV File Uploader</div>
+            <div class="abstract-text">
+                Please upload a CSV file to get started with the analysis. Use the button below to select your file.
+            </div>
+
+            <form id="csv_form" method="POST" enctype="multipart/form-data" action="/upload">
+                <!-- Custom styled file input -->
+                <div class="file-input-container">
+                    <input type="file" name="csv_file" accept=".csv" required id="csv_file" class="csv-input" onchange="enableUploadButton()">
+                    <label for="csv_file" class="custom-file-upload">
+                        Upload .CSV File
+                    </label>
+                </div>
+                <button type="submit" id="uploadButton" class="action-button" disabled>Upload CSV</button>
+            </form>
+            
+            <!-- Loading Indicator -->
+            <div id="loading" style="display: none;">Uploading...</div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div id="uploadSuccessNotification" class="upload-success-notification" style="display:none;">
+        <p>File uploaded successfully!</p>
+    </div>
+
+    <script src="static/js/script.js"></script>
+</body>
+</html>

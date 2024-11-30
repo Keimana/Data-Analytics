@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualizations</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script> <!-- CSV Parsing Library -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            padding-top: 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 20px;
+            justify-content: space-between;
+        }
+        .plot-section {
+            width: 48%;
+            min-height: 400px;
+            background: #3C3C3C;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="file"] {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Visualizations</h1>
+    <div class="container" id="visualizations">
+        <!-- Scatter Plot Section -->
+        <div class="plot-section" id="scatter-plot-section">
+            <div id="scatter-plot-container"></div>
+            <label for="scatter-input">Upload CSV for Scatter Plot:</label>
+            <input type="file" id="scatter-csv" accept=".csv">
+            <button onclick="generateScatterPlot()">Generate Scatter Plot</button>
+        </div>
+
+        <!-- Line Chart Section -->
+        <div class="plot-section" id="line-chart-section">
+            <div id="line-chart-container"></div>
+            <label for="line-input">Upload CSV for Line Chart:</label>
+            <input type="file" id="line-csv" accept=".csv">
+            <button onclick="generateLineChart()">Generate Line Chart</button>
+        </div>
+
+        <!-- Box Plot Section -->
+        <div class="plot-section" id="box-plot-section">
+            <div id="box-plot-container"></div>
+            <label for="box-input">Upload CSV for Box Plot:</label>
+            <input type="file" id="box-csv" accept=".csv">
+            <button onclick="generateBoxPlot()">Generate Box Plot</button>
+        </div>
+
+        <!-- Histogram Section -->
+        <div class="plot-section" id="histogram-section">
+            <div id="histogram-container"></div>
+            <label for="histogram-input">Upload CSV for Histogram:</label>
+            <input type="file" id="histogram-csv" accept=".csv">
+            <button onclick="generateHistogram()">Generate Histogram</button>
+        </div>
+
+        <!-- Stacked Column Chart Section -->
+        <div class="plot-section" id="stacked-column-section">
+            <div id="stacked-column-container"></div>
+            <label for="stacked-column-input">Upload CSV for Stacked Column Chart:</label>
+            <input type="file" id="stacked-column-csv" accept=".csv">
+            <button onclick="generateStackedColumn()">Generate Stacked Column Chart</button>
+        </div>
+    </div>
+
+    <script>
+        let globalData = {}; // Global variable to store parsed CSV data
+
+        // Function to handle CSV file input and parse it
+        function handleCSVInput(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const csvData = event.target.result;
+                Papa.parse(csvData, {
+                    header: true,
+                    dynamicTyping: true,
+                    complete: function(results) {
+                        globalData = results.data; // Store parsed CSV data
+                        callback();
+                    }
+                });
+            };
+            reader.readAsText(file);
+        }
+
+        // Generate Scatter Plot
+        function generateScatterPlot() {
+            const fileInput = document.getElementById("scatter-csv");
+            if (fileInput.files.length) {
+                handleCSVInput(fileInput.files[0], function() {
+                    const x = globalData.map(row => row['X']); // Replace 'X' with the actual column name
+                    const y = globalData.map(row => row['Y']); // Replace 'Y' with the actual column name
+
+                    Plotly.newPlot('scatter-plot-container', [{
+                        x: x,
+                        y: y,
+                        mode: 'markers',
+                        type: 'scatter',
+                        marker: { color: 'blue' }
+                    }], {
+                        title: 'Scatter Plot',
+                        paper_bgcolor: '#3C3C3C',
+                        plot_bgcolor: '#3C3C3C',
+                        font: { color: 'white' }
+                    });
+                });
+            }
+        }
+
+        // Generate Line Chart
+        function generateLineChart() {
+            const fileInput = document.getElementById("line-csv");
+            if (fileInput.files.length) {
+                handleCSVInput(fileInput.files[0], function() {
+                    const x = globalData.map(row => row['X']); // Replace 'X' with the actual column name
+                    const y = globalData.map(row => row['Y']); // Replace 'Y' with the actual column name
+
+                    Plotly.newPlot('line-chart-container', [{
+                        x: x,
+                        y: y,
+                        mode: 'lines',
+                        type: 'scatter',
+                        line: { color: 'green' }
+                    }], {
+                        title: 'Line Chart',
+                        paper_bgcolor: '#3C3C3C',
+                        plot_bgcolor: '#3C3C3C',
+                        font: { color: 'white' }
+                    });
+                });
+            }
+        }
+
+        // Generate Box Plot
+        function generateBoxPlot() {
+            const fileInput = document.getElementById("box-csv");
+            if (fileInput.files.length) {
+                handleCSVInput(fileInput.files[0], function() {
+                    const variable = globalData.map(row => row['Value']); // Replace 'Value' with the actual column name
+
+                    Plotly.newPlot('box-plot-container', [{
+                        y: variable,
+                        type: 'box',
+                        marker: { color: 'purple' }
+                    }], {
+                        title: 'Box Plot',
+                        paper_bgcolor: '#3C3C3C',
+                        plot_bgcolor: '#3C3C3C',
+                        font: { color: 'white' }
+                    });
+                });
+            }
+        }
+
+        // Generate Histogram
+        function generateHistogram() {
+            const fileInput = document.getElementById("histogram-csv");
+            if (fileInput.files.length) {
+                handleCSVInput(fileInput.files[0], function() {
+                    const variable = globalData.map(row => row['Value']); // Replace 'Value' with the actual column name
+
+                    Plotly.newPlot('histogram-container', [{
+                        x: variable,
+                        type: 'histogram',
+                        marker: { color: 'orange' }
+                    }], {
+                        title: 'Histogram',
+                        paper_bgcolor: '#3C3C3C',
+                        plot_bgcolor: '#3C3C3C',
+                        font: { color: 'white' }
+                    });
+                });
+            }
+        }
+
+        // Generate Stacked Column Chart
+        function generateStackedColumn() {
+            const fileInput = document.getElementById("stacked-column-csv");
+            if (fileInput.files.length) {
+                handleCSVInput(fileInput.files[0], function() {
+                    const categories = globalData.map(row => row['Category']); // Replace 'Category' with actual column name
+                    const series1 = globalData.map(row => row['Series1']); // Replace 'Series1' with actual column name
+                    const series2 = globalData.map(row => row['Series2']); // Replace 'Series2' with actual column name
+
+                    Plotly.newPlot('stacked-column-container', [
+                        {
+                            x: categories,
+                            y: series1,
+                            type: 'bar',
+                            name: 'Series 1'
+                        },
+                        {
+                            x: categories,
+                            y: series2,
+                            type: 'bar',
+                            name: 'Series 2'
+                        }
+                    ], {
+                        title: 'Stacked Column Chart',
+                        barmode: 'stack',
+                        paper_bgcolor: '#3C3C3C',
+                        plot_bgcolor: '#3C3C3C',
+                        font: { color: 'white' }
+                    });
+                });
+            }
+        }
+    </script>
+</body>
+</html>
